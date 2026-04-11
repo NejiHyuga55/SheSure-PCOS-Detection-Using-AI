@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SheSure — Analysis Results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --rose:    #c2185b;
+      --rose-dk: #8b1a50;
+      --rose-lt: #ffeef5;
+      --rose-md: #f5d5e0;
+      --pink:    #ed93b1;
+      --cream:   #fffaf9;
+      --text:    #3a1020;
+      --muted:   #8a5a6a;
+      --border:  #f0c8d8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      height: 64px;
+    }
+
+    .logo { display: flex; align-items: center; text-decoration: none; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .step-dot.done {
+      background: #f5ffe8;
+      border-color: #7bc47a;
+      color: #4caf50;
+    }
+
+    .step-line {
+      width: 32px; height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .step-line.done { background: #7bc47a; }
+
+    .nav-back {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 13px;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--rose); }
+
+    /* ── PAGE LAYOUT ── */
+    .page-wrapper {
+      min-height: 100vh;
+      padding: 100px 2rem 60px;
+      background: linear-gradient(160deg, #fff5f8 0%, #fce0ec 40%, #f5c8da 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-circle { position: absolute; border-radius: 50%; opacity: 0.08; pointer-events: none; }
+    .bg-circle.c1 { width: 700px; height: 700px; background: var(--rose); top: -250px; right: -200px; }
+    .bg-circle.c2 { width: 400px; height: 400px; background: #e91e8c; bottom: -150px; left: -100px; }
+    .bg-circle.c3 { width: 200px; height: 200px; background: var(--rose-dk); top: 50%; left: 40%; }
+
+    .page-inner {
+      max-width: 1000px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── HEADER BLOCK ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .page-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(194,24,91,0.1);
+      color: var(--rose);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 30px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(194,24,91,0.2);
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--rose-dk);
+      line-height: 1.2;
+      margin-bottom: 0.7rem;
+    }
+
+    .page-title em { font-style: italic; color: var(--rose); }
+
+    .page-sub {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── RESULTS CARDS ── */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 48px rgba(139,26,80,0.1);
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-icon {
+      width: 48px; height: 48px;
+      background: var(--rose-lt);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--rose); font-size: 20px;
+    }
+
+    .result-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--rose-dk); }
+
+    .result-value {
+      font-size: 2.5rem; font-weight: 700; color: var(--rose);
+      margin-bottom: 0.5rem;
+    }
+
+    .result-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    .probability-bar {
+      width: 100%; height: 8px;
+      background: var(--rose-lt);
+      border-radius: 6px; overflow: hidden;
+      margin: 1rem 0;
+    }
+
+    .probability-fill {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, var(--pink), var(--rose));
+      width: 0; transition: width 1s ease;
+    }
+
+    /* ── TREATMENT CARD ── */
+    .treatment-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 48px rgba(139,26,80,0.1);
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .treatment-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--rose-dk); margin-bottom: 1rem; }
+
+    .treatment-recommendation {
+      background: var(--rose-lt);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .treatment-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .treatment-value { font-size: 18px; font-weight: 600; color: var(--rose-dk); }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      text-align: center;
+      margin-top: 3rem;
+      animation: fadeUp 0.9s 0.3s ease both;
+    }
+
+    .disclaimer {
+      background: rgba(255,255,255,0.8);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .disclaimer strong { color: var(--rose-dk); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── */
+<header>
+  <nav>
+    <a href="inedx.html" class="logo">
+      <svg width="175" height="40" viewBox="0 0 175 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="10" width="32" height="20" rx="10" fill="#fce8f0" stroke="#c2185b" stroke-width="1.5"/>
+        <path d="M8 20 L12 20 L15 13 L18 27 L21 20 L28 20" stroke="#c2185b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <text x="44" y="27" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#8b1a50">She</text>
+        <text x="80" y="27" font-family="Georgia,serif" font-size="22" font-weight="400" fill="#c2185b">Sure</text>
+      </svg>
+    </a>
+
+    <div class="nav-right">
+      <!-- Step indicator pills -->
+      <div class="nav-step-indicator">
+        <div class="step-dot done"><i class="fas fa-check" style="font-size:9px;"></i></div>
+        <div class="step-line done"></div>
+        <div class="step-dot done"><i class="fas fa-check" style="font-size:9px;"></i></div>
+        <div class="step-line done"></div>
+        <div class="step-dot done"><i class="fas fa-check" style="font-size:9px;"></i></div>
+      </div>
+      <a href="shesure-clinical.html" class="nav-back">
+        <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- ── MAIN ── */
+<div class="page-wrapper">
+  <div class="bg-circle c1"></div>
+  <div class="bg-circle c2"></div>
+  <div class="bg-circle c3"></div>
+
+  <div class="page-inner">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-eyebrow">
+        <i class="fas fa-chart-line" style="font-size:10px;"></i>
+        Analysis Complete
+      </div>
+      <h1 class="page-title">Your <em>PCOS Analysis</em> Results</h1>
+      <p class="page-sub">Based on your ultrasound image and clinical data, here's your comprehensive PCOS risk assessment.</p>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-icon"><i class="fas fa-brain"></i></div>
+          <div class="result-title">AI Prediction</div>
+        </div>
+        <div class="result-value" id="prediction">—</div>
+        <div class="result-desc" id="prediction-desc">Analyzing your data...</div>
+        <div class="probability-bar">
+          <div class="probability-fill" id="probability-fill"></div>
+        </div>
+        <div class="result-desc">Probability score based on multimodal analysis</div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-icon"><i class="fas fa-microscope"></i></div>
+          <div class="result-title">Ultrasound Analysis</div>
+        </div>
+        <div class="result-value" id="cnn-prob">—%</div>
+        <div class="result-desc" id="cnn-desc">CNN model analysis of follicle count and ovary volume</div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-icon"><i class="fas fa-clipboard-list"></i></div>
+          <div class="result-title">Clinical Assessment</div>
+        </div>
+        <div class="result-value" id="mlp-prob">—%</div>
+        <div class="result-desc" id="mlp-desc">MLP analysis of your medical data and symptoms</div>
+      </div>
+    </div>
+
+    <!-- Treatment Recommendation -->
+    <div class="treatment-card">
+      <div class="treatment-title">Recommended Treatment Approach</div>
+      <div class="treatment-recommendation">
+        <div class="treatment-label">Primary Recommendation</div>
+        <div class="treatment-value" id="treatment">Analyzing...</div>
+      </div>
+      <div class="result-desc">Based on your risk profile, our AI suggests this treatment strategy. Always consult with a healthcare professional for personalized medical advice.</div>
+    </div>
+
+    <!-- Footer -->
+    <div class="page-footer">
+      <div class="disclaimer">
+        <strong>⚠️ Medical Disclaimer:</strong> This analysis is for informational purposes only and should not replace professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for any health concerns.
+      </div>
+    </div>
+
+  </div><!-- / page-inner -->
+</div>
+
+<script>
+  // Get result from URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const resultParam = urlParams.get('result');
+  if (resultParam) {
+    const result = JSON.parse(decodeURIComponent(resultParam));
+    displayResults(result);
+  }
+
+  function displayResults(result) {
+    // Update prediction
+    const prediction = result.prediction > 0.5 ? 'PCOS Detected' : 'No PCOS Detected';
+    document.getElementById('prediction').textContent = prediction;
+    document.getElementById('prediction-desc').textContent = `Confidence: ${(result.prediction * 100).toFixed(1)}%`;
+
+    // Update probability bar
+    const probFill = document.getElementById('probability-fill');
+    probFill.style.width = `${result.prediction * 100}%`;
+
+    // Update CNN prob
+    document.getElementById('cnn-prob').textContent = `${(result.cnn_prob * 100).toFixed(1)}%`;
+    document.getElementById('cnn-desc').textContent = result.cnn_desc || 'CNN model analysis of follicle count and ovary volume';
+
+    // Update MLP prob
+    document.getElementById('mlp-prob').textContent = `${(result.mlp_prob * 100).toFixed(1)}%`;
+    document.getElementById('mlp-desc').textContent = result.mlp_desc || 'MLP analysis of your medical data and symptoms';
+
+    // Update treatment
+    document.getElementById('treatment').textContent = result.treatment || 'Consult healthcare provider';
+  }
+</script>
+
+</body>
+</html>

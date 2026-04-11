@@ -9,3 +9,5 @@ pillow
 kaggle
 kagglehub
 tqdm
+flask
+flask-cors

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SheSure — Clinical Data</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --rose:    #c2185b;
+      --rose-dk: #8b1a50;
+      --rose-lt: #ffeef5;
+      --rose-md: #f5d5e0;
+      --pink:    #ed93b1;
+      --cream:   #fffaf9;
+      --text:    #3a1020;
+      --muted:   #8a5a6a;
+      --border:  #f0c8d8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      height: 64px;
+    }
+
+    .logo { display: flex; align-items: center; text-decoration: none; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: white;
+      box-shadow: 0 0 0 4px rgba(194,24,91,0.15);
+    }
+
+    .step-dot.done {
+      background: #f5ffe8;
+      border-color: #7bc47a;
+      color: #4caf50;
+    }
+
+    .step-line {
+      width: 32px; height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .step-line.done { background: #7bc47a; }
+
+    .nav-back {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 13px;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--rose); }
+
+    /* ── PAGE LAYOUT ── */
+    .page-wrapper {
+      min-height: 100vh;
+      padding: 100px 2rem 60px;
+      background: linear-gradient(160deg, #fff5f8 0%, #fce0ec 40%, #f5c8da 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-circle { position: absolute; border-radius: 50%; opacity: 0.08; pointer-events: none; }
+    .bg-circle.c1 { width: 700px; height: 700px; background: var(--rose); top: -250px; right: -200px; }
+    .bg-circle.c2 { width: 400px; height: 400px; background: #e91e8c; bottom: -150px; left: -100px; }
+    .bg-circle.c3 { width: 200px; height: 200px; background: var(--rose-dk); top: 50%; left: 40%; }
+
+    .page-inner {
+      max-width: 860px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── HEADER BLOCK ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .page-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(194,24,91,0.1);
+      color: var(--rose);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 30px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(194,24,91,0.2);
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--rose-dk);
+      line-height: 1.2;
+      margin-bottom: 0.7rem;
+    }
+
+    .page-title em { font-style: italic; color: var(--rose); }
+
+    .page-sub {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── MAIN CARD ── */
+    .main-card {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 32px 80px rgba(139,26,80,0.13);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .card-top-bar {
+      background: linear-gradient(90deg, var(--rose-dk), var(--rose));
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .top-bar-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 15px;
+    }
+
+    .top-bar-text { color: white; }
+    .top-bar-title { font-size: 14px; font-weight: 600; }
+    .top-bar-sub   { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+
+    .card-body { padding: 2.5rem; }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--rose-dk);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text);
+      background: white;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(194,24,91,0.1);
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+    }
+
+    /* ── CARD FOOTER ── */
+    .card-footer {
+      padding: 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      background: #fffafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-note {
+      font-size: 12px; color: #c090a8;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .footer-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 14px; font-weight: 500;
+      padding: 12px 20px; border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: white; text-decoration: none;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--rose); color: var(--rose); }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--rose); color: white;
+      padding: 13px 28px; border-radius: 50px;
+      font-size: 14px; font-weight: 500;
+      text-decoration: none; cursor: pointer;
+      transition: all 0.25s; border: none;
+      box-shadow: 0 8px 24px rgba(194,24,91,0.28);
+      position: relative; overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.4s;
+    }
+
+    .btn-primary:hover::after { transform: translateX(100%); }
+    .btn-primary:hover { background: var(--rose-dk); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(194,24,91,0.4); }
+
+    .btn-primary:disabled,
+    .btn-primary.disabled {
+      background: #e0a0b8; box-shadow: none;
+      cursor: not-allowed; transform: none;
+      pointer-events: none;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .card-body { padding: 1.5rem; }
+      .card-footer { padding: 1.2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <nav>
+    <a href="inedx.html" class="logo">
+      <svg width="175" height="40" viewBox="0 0 175 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="10" width="32" height="20" rx="10" fill="#fce8f0" stroke="#c2185b" stroke-width="1.5"/>
+        <path d="M8 20 L12 20 L15 13 L18 27 L21 20 L28 20" stroke="#c2185b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <text x="44" y="27" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#8b1a50">She</text>
+        <text x="80" y="27" font-family="Georgia,serif" font-size="22" font-weight="400" fill="#c2185b">Sure</text>
+      </svg>
+    </a>
+
+    <div class="nav-right">
+      <!-- Step indicator pills -->
+      <div class="nav-step-indicator">
+        <div class="step-dot done"><i class="fas fa-check" style="font-size:9px;"></i></div>
+        <div class="step-line done"></div>
+        <div class="step-dot active">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot">3</div>
+      </div>
+      <a href="second.html" class="nav-back">
+        <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back to Upload
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- ── MAIN ── -->
+<div class="page-wrapper">
+  <div class="bg-circle c1"></div>
+  <div class="bg-circle c2"></div>
+  <div class="bg-circle c3"></div>
+
+  <div class="page-inner">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-eyebrow">
+        <i class="fas fa-clipboard-list" style="font-size:10px;"></i>
+        Step 2 of 3
+      </div>
+      <h1 class="page-title">Enter Your <em>Clinical Data</em></h1>
+      <p class="page-sub">Provide your medical information for a comprehensive PCOS analysis. All data is processed securely and privately.</p>
+    </div>
+
+    <!-- Main Card -->
+    <div class="main-card">
+
+      <!-- Card Top Bar -->
+      <div class="card-top-bar">
+        <div class="top-bar-icon"><i class="fas fa-clipboard-list"></i></div>
+        <div class="top-bar-text">
+          <div class="top-bar-title">Clinical Information Form</div>
+          <div class="top-bar-sub">Tabular data analysis · Secure processing</div>
+        </div>
+        <div class="top-bar-badge"><i class="fas fa-lock" style="font-size:9px;"></i> Encrypted & Secure</div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Info Box -->
+        <div class="info-box" style="display: flex; align-items: flex-start; gap: 12px; background: linear-gradient(135deg, #fff5f9, #fce8f0); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 2rem;">
+          <i class="fas fa-circle-info" style="color: var(--rose); font-size: 16px; margin-top: 2px; flex-shrink: 0;"></i>
+          <div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--rose-dk); margin-bottom: 4px;">Required Information</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Please fill in your clinical measurements and symptoms. This information helps our AI provide accurate predictions.</div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form id="clinicalForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="age">Age (years)</label>
+              <input type="number" id="age" name="age" class="form-input" required min="10" max="100">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="weight">Weight (kg)</label>
+              <input type="number" id="weight" name="weight" class="form-input" required step="0.1" min="30" max="200">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="height">Height (cm)</label>
+              <input type="number" id="height" name="height" class="form-input" required min="100" max="250">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="bmi">BMI</label>
+              <input type="number" id="bmi" name="bmi" class="form-input" step="0.1" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cycle_length">Cycle Length (days)</label>
+              <input type="number" id="cycle_length" name="cycle_length" class="form-input" required min="15" max="60">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="hair_growth">Hair Growth (0-4)</label>
+              <select id="hair_growth" name="hair_growth" class="form-input form-select" required>
+                <option value="">Select</option>
+                <option value="0">0 - None</option>
+                <option value="1">1 - Minimal</option>
+                <option value="2">2 - Moderate</option>
+                <option value="3">3 - Severe</option>
+                <option value="4">4 - Very Severe</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="skin_darkening">Skin Darkening (0-4)</label>
+              <select id="skin_darkening" name="skin_darkening" class="form-input form-select" required>
+                <option value="">Select</option>
+                <option value="0">0 - None</option>
+                <option value="1">1 - Minimal</option>
+                <option value="2">2 - Moderate</option>
+                <option value="3">3 - Severe</option>
+                <option value="4">4 - Very Severe</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="weight_gain">Weight Gain (Yes/No)</label>
+              <select id="weight_gain" name="weight_gain" class="form-input form-select" required>
+                <option value="">Select</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="hair_loss">Hair Loss (Yes/No)</label>
+              <select id="hair_loss" name="hair_loss" class="form-input form-select" required>
+                <option value="">Select</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="pimples">Pimples (Yes/No)</label>
+              <select id="pimples" name="pimples" class="form-input form-select" required>
+                <option value="">Select</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fast_food">Fast Food (Yes/No)</label>
+              <select id="fast_food" name="fast_food" class="form-input form-select" required>
+                <option value="">Select</option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+        </form>
+
+      </div><!-- / card-body -->
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <span class="footer-note">
+          <i class="fas fa-shield-halved" style="font-size:13px; color: var(--rose);"></i>
+          Your data is encrypted and never shared without consent
+        </span>
+        <div class="footer-actions">
+          <a href="second.html" class="btn-secondary">
+            <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back
+          </a>
+          <button class="btn-primary" id="analyzeBtn" onclick="submitClinicalData()">
+            Analyze Now <i class="fas fa-arrow-right" style="font-size:12px;"></i>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- / main-card -->
+
+  </div><!-- / page-inner -->
+</div>
+
+<script>
+  // Auto-calculate BMI
+  function calculateBMI() {
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value) / 100; // cm to m
+    if (weight && height) {
+      const bmi = (weight / (height * height)).toFixed(1);
+      document.getElementById('bmi').value = bmi;
+    }
+  }
+
+  document.getElementById('weight').addEventListener('input', calculateBMI);
+  document.getElementById('height').addEventListener('input', calculateBMI);
+
+  function submitClinicalData() {
+    const form = document.getElementById('clinicalForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Send to backend
+    fetch('/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(result => {
+      // Redirect to results page or show results
+      window.location.href = 'results.html?result=' + encodeURIComponent(JSON.stringify(result));
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
+    });
+  }
+</script>
+
+</body>
+</html>

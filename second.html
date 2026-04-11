@@ -686,7 +686,7 @@
 <!-- ── HEADER ── -->
 <header>
   <nav>
-    <a href="index.html" class="logo">
+    <a href="inedx.html" class="logo">
       <svg width="175" height="40" viewBox="0 0 175 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="10" width="32" height="20" rx="10" fill="#fce8f0" stroke="#c2185b" stroke-width="1.5"/>
         <path d="M8 20 L12 20 L15 13 L18 27 L21 20 L28 20" stroke="#c2185b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -704,7 +704,7 @@
         <div class="step-line"></div>
         <div class="step-dot">3</div>
       </div>
-      <a href="index.html" class="nav-back">
+      <a href="inedx.html" class="nav-back">
         <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back to Home
       </a>
     </div>
@@ -888,7 +888,7 @@
           Your image is encrypted and never shared without consent
         </span>
         <div class="footer-actions">
-          <a href="index.html" class="btn-secondary">
+          <a href="inedx.html" class="btn-secondary">
             <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back
           </a>
           <button class="btn-primary disabled" id="nextBtn" onclick="goToNext()">
@@ -1022,8 +1022,25 @@
 
   function goToNext() {
     if (!uploadedFile) return;
-    // Navigate to clinical data page
-    window.location.href = 'shesure-clinical.html';
+
+    // First upload the image
+    const formData = new FormData();
+    formData.append('image', uploadedFile);
+
+    fetch('/upload_image', {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(result => {
+      console.log('Image uploaded:', result);
+      // Navigate to clinical data page
+      window.location.href = 'shesure-clinical.html';
+    })
+    .catch(error => {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image. Please try again.');
+    });
   }
 </script>
 
