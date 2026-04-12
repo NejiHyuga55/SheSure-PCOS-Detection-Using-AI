@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SheSure — Clinical Data</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --rose:    #c2185b;
+      --rose-dk: #8b1a50;
+      --rose-lt: #ffeef5;
+      --rose-md: #f5d5e0;
+      --pink:    #ed93b1;
+      --cream:   #fffaf9;
+      --text:    #3a1020;
+      --muted:   #8a5a6a;
+      --border:  #f0c8d8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      height: 64px;
+    }
+
+    .logo { display: flex; align-items: center; text-decoration: none; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .step-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: white;
+      box-shadow: 0 0 0 4px rgba(194,24,91,0.15);
+    }
+
+    .step-dot.done {
+      background: #f5ffe8;
+      border-color: #7bc47a;
+      color: #4caf50;
+    }
+
+    .step-line {
+      width: 32px; height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .step-line.done { background: #7bc47a; }
+
+    .nav-back {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 13px;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--rose); }
+
+    /* ── PAGE LAYOUT ── */
+    .page-wrapper {
+      min-height: 100vh;
+      padding: 100px 2rem 60px;
+      background: linear-gradient(160deg, #fff5f8 0%, #fce0ec 40%, #f5c8da 100%);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-circle { position: absolute; border-radius: 50%; opacity: 0.08; pointer-events: none; }
+    .bg-circle.c1 { width: 700px; height: 700px; background: var(--rose); top: -250px; right: -200px; }
+    .bg-circle.c2 { width: 400px; height: 400px; background: #e91e8c; bottom: -150px; left: -100px; }
+    .bg-circle.c3 { width: 200px; height: 200px; background: var(--rose-dk); top: 50%; left: 40%; }
+
+    .page-inner {
+      max-width: 860px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── HEADER BLOCK ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .page-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(194,24,91,0.1);
+      color: var(--rose);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 30px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(194,24,91,0.2);
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--rose-dk);
+      line-height: 1.2;
+      margin-bottom: 0.7rem;
+    }
+
+    .page-title em { font-style: italic; color: var(--rose); }
+
+    .page-sub {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── MAIN CARD ── */
+    .main-card {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 32px 80px rgba(139,26,80,0.13);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .card-top-bar {
+      background: linear-gradient(90deg, var(--rose-dk), var(--rose));
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .top-bar-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 15px;
+    }
+
+    .top-bar-text { color: white; }
+    .top-bar-title { font-size: 14px; font-weight: 600; }
+    .top-bar-sub   { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+
+    .top-bar-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .card-body { padding: 2.5rem; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: linear-gradient(135deg, #fff5f9, #fce8f0);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-box-icon { color: var(--rose); font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+    .info-box-title { font-size: 13px; font-weight: 600; color: var(--rose-dk); margin-bottom: 4px; }
+    .info-box-text  { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 1.8rem 0 1.2rem;
+    }
+
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; color: var(--rose);
+      letter-spacing: 0.07em; text-transform: uppercase;
+      background: var(--rose-lt);
+      padding: 4px 12px; border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── FORM ELEMENTS ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-grid.cols-1 { grid-template-columns: 1fr; }
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--rose-dk);
+      letter-spacing: 0.02em;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .field label i { color: var(--pink); font-size: 11px; }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: white;
+      outline: none;
+      transition: all 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 4px rgba(194,24,91,0.08);
+    }
+
+    .field input::placeholder { color: #cca0b5; }
+
+    .field .hint {
+      font-size: 11px;
+      color: #c090a8;
+    }
+
+    /* select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--rose);
+      pointer-events: none;
+    }
+    .select-wrap select { padding-right: 36px; cursor: pointer; }
+
+    /* ── TOGGLE BUTTONS ── */
+    .toggle-group {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+
+    .toggle-btn {
+      flex: 1; min-width: 70px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--muted);
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .toggle-btn:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-lt); }
+
+    .toggle-btn.selected {
+      background: linear-gradient(135deg, var(--rose-lt), var(--rose-md));
+      border-color: var(--rose);
+      color: var(--rose-dk);
+      font-weight: 600;
+      box-shadow: 0 0 0 3px rgba(194,24,91,0.1);
+    }
+
+    /* ── SLIDER ── */
+    .slider-field { display: flex; flex-direction: column; gap: 8px; }
+
+    .slider-field label {
+      font-size: 12px; font-weight: 600;
+      color: var(--rose-dk); letter-spacing: 0.02em;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .slider-label-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 4px;
+    }
+
+    .slider-label-row span { font-size: 11px; color: #c090a8; }
+
+    .slider-val-pill {
+      background: var(--rose);
+      color: white; font-size: 13px; font-weight: 600;
+      padding: 3px 12px; border-radius: 20px;
+      min-width: 44px; text-align: center;
+    }
+
+    input[type=range] {
+      width: 100%; height: 6px;
+      appearance: none; -webkit-appearance: none;
+      background: var(--rose-md);
+      border-radius: 6px; outline: none; cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--rose);
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(194,24,91,0.35);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+    /* ── PROGRESS STEPS ── */
+    .progress-bar-wrap {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.2rem 1.8rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .prog-step {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; flex: 1; position: relative;
+    }
+
+    .prog-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 16px; left: 50%; right: -50%;
+      height: 2px; background: var(--border);
+      z-index: 0;
+    }
+
+    .prog-step.done::after { background: linear-gradient(90deg, #7bc47a, var(--border)); }
+    .prog-step.active::after { background: linear-gradient(90deg, var(--rose), var(--border)); }
+
+    .prog-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+      border: 2px solid var(--border); background: white;
+      color: var(--muted); transition: all 0.4s;
+    }
+
+    .prog-step.done .prog-dot {
+      background: #f0fff0; border-color: #7bc47a; color: #4caf50;
+    }
+
+    .prog-step.active .prog-dot {
+      background: var(--rose); border-color: var(--rose); color: white;
+      box-shadow: 0 0 0 5px rgba(194,24,91,0.15);
+    }
+
+    .prog-label {
+      font-size: 11px; color: var(--muted); white-space: nowrap; font-weight: 500;
+    }
+
+    .prog-step.active .prog-label { color: var(--rose); font-weight: 600; }
+    .prog-step.done .prog-label  { color: #4caf50; }
+
+    /* ── VALIDATION ── */
+    .field input.error,
+    .field select.error { border-color: #e53935; box-shadow: 0 0 0 3px rgba(229,57,53,0.1); }
+
+    .field .err-msg {
+      font-size: 11px; color: #e53935;
+      display: none; align-items: center; gap: 4px;
+    }
+
+    .field .err-msg.show { display: flex; }
+
+    /* ── CARD FOOTER ── */
+    .card-footer {
+      padding: 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      background: #fffafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-note {
+      font-size: 12px; color: #c090a8;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .footer-actions { display: flex; align-items: center; gap: 12px; }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 14px; font-weight: 500;
+      padding: 12px 20px; border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: white; text-decoration: none;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--rose); color: var(--rose); }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--rose); color: white;
+      padding: 13px 28px; border-radius: 50px;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.25s; border: none;
+      box-shadow: 0 8px 24px rgba(194,24,91,0.28);
+      position: relative; overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.4s;
+    }
+
+    .btn-primary:hover::after { transform: translateX(100%); }
+    .btn-primary:hover { background: var(--rose-dk); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(194,24,91,0.4); }
+
+    /* ── SIDE STATS ── */
+    .side-info {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .side-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .side-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(194,24,91,0.1); }
+
+    .side-card-icon {
+      width: 44px; height: 44px;
+      background: var(--rose-lt);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--rose);
+      margin: 0 auto 0.7rem;
+    }
+
+    .side-card-val { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--rose-dk); font-weight: 700; }
+    .side-card-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .card-body { padding: 1.5rem; }
+      .card-footer { padding: 1.2rem 1.5rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+      .side-info { grid-template-columns: 1fr 1fr; }
+      .side-info .side-card:last-child { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 500px) {
+      .side-info { grid-template-columns: 1fr; }
+      .side-info .side-card:last-child { grid-column: auto; }
+      .prog-label { display: none; }
+      .form-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="175" height="40" viewBox="0 0 175 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="10" width="32" height="20" rx="10" fill="#fce8f0" stroke="#c2185b" stroke-width="1.5"/>
+        <path d="M8 20 L12 20 L15 13 L18 27 L21 20 L28 20" stroke="#c2185b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <text x="44" y="27" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#8b1a50">She</text>
+        <text x="80" y="27" font-family="Georgia,serif" font-size="22" font-weight="400" fill="#c2185b">Sure</text>
+      </svg>
+    </a>
+    <div class="nav-right">
+      <div class="nav-step-indicator">
+        <div class="step-dot done"><i class="fas fa-check" style="font-size:9px;"></i></div>
+        <div class="step-line done"></div>
+        <div class="step-dot active">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot">3</div>
+      </div>
+      <a href="shesure-upload.html" class="nav-back">
+        <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back to Home
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- ── MAIN ── -->
+<div class="page-wrapper">
+  <div class="bg-circle c1"></div>
+  <div class="bg-circle c2"></div>
+  <div class="bg-circle c3"></div>
+
+  <div class="page-inner">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-eyebrow">
+        <i class="fas fa-clipboard-list" style="font-size:10px;"></i>
+        Step 2 of 3
+      </div>
+      <h1 class="page-title">Enter Your <em>Clinical Data</em></h1>
+      <p class="page-sub">Answer a few quick questions about your health. Our AI uses these key markers to detect PCOS patterns from your clinical profile.</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-bar-wrap">
+      <div class="prog-step done">
+        <div class="prog-dot"><i class="fas fa-check" style="font-size:11px;"></i></div>
+        <span class="prog-label">Upload Scan</span>
+      </div>
+      <div class="prog-step active">
+        <div class="prog-dot"><i class="fas fa-clipboard-list" style="font-size:11px;"></i></div>
+        <span class="prog-label">Clinical Data</span>
+      </div>
+      <div class="prog-step">
+        <div class="prog-dot">3</div>
+        <span class="prog-label">AI Analysis</span>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="main-card">
+
+      <!-- Card Top Bar -->
+      <div class="card-top-bar">
+        <div class="top-bar-icon"><i class="fas fa-stethoscope"></i></div>
+        <div class="top-bar-text">
+          <div class="top-bar-title">Clinical Data Input</div>
+          <div class="top-bar-sub">Personal & Health Information · 8 key fields</div>
+        </div>
+        <div class="top-bar-badge"><i class="fas fa-lock" style="font-size:9px;"></i> Encrypted & Secure</div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <i class="fas fa-circle-info info-box-icon"></i>
+          <div>
+            <div class="info-box-title">Why we ask this</div>
+            <div class="info-box-text">These 8 clinical markers are the strongest predictors our AI model uses to detect PCOS. They were selected from a global dataset of 75 countries. All fields are required for accurate analysis.</div>
+          </div>
+        </div>
+
+        <!-- SECTION 1: Personal Info -->
+        <div class="section-divider">
+          <div class="divider-line"></div>
+          <div class="divider-label"><i class="fas fa-user" style="font-size:10px;"></i> Personal Info</div>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label><i class="fas fa-calendar"></i> Age</label>
+            <input type="number" id="age" placeholder="e.g. 26" min="15" max="50" oninput="validateField('age')" />
+            <span class="hint">Between 15 – 50 years</span>
+            <span class="err-msg" id="age-err"><i class="fas fa-triangle-exclamation"></i> Please enter a valid age (15–50)</span>
+          </div>
+          <div class="field">
+            <label><i class="fas fa-weight-scale"></i> BMI</label>
+            <input type="number" id="bmi" placeholder="e.g. 23.5" min="14" max="55" step="0.1" oninput="validateField('bmi')" />
+            <span class="hint">Body Mass Index · weight(kg) ÷ height(m)²</span>
+            <span class="err-msg" id="bmi-err"><i class="fas fa-triangle-exclamation"></i> Please enter a valid BMI (14–55)</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label><i class="fas fa-earth-asia"></i> Ethnicity</label>
+            <div class="select-wrap">
+              <select id="ethnicity" onchange="validateField('ethnicity')">
+                <option value="">Select your ethnicity</option>
+                <option>South Asian</option>
+                <option>East Asian</option>
+                <option>Middle Eastern</option>
+                <option>African</option>
+                <option>Caucasian</option>
+                <option>Hispanic / Latino</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <span class="err-msg" id="ethnicity-err"><i class="fas fa-triangle-exclamation"></i> Please select an option</span>
+          </div>
+          <div class="field">
+            <label><i class="fas fa-city"></i> Living Area</label>
+            <div class="select-wrap">
+              <select id="area" onchange="validateField('area')">
+                <option value="">Select living area</option>
+                <option>Urban</option>
+                <option>Rural</option>
+              </select>
+            </div>
+            <span class="err-msg" id="area-err"><i class="fas fa-triangle-exclamation"></i> Please select an option</span>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Symptoms -->
+        <div class="section-divider">
+          <div class="divider-line"></div>
+          <div class="divider-label"><i class="fas fa-heart-pulse" style="font-size:10px;"></i> Symptoms & History</div>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="form-grid cols-1" style="margin-bottom:16px;">
+          <div class="field">
+            <label><i class="fas fa-droplet"></i> Menstrual Regularity</label>
+            <div class="toggle-group" id="menstrual-grp">
+              <button class="toggle-btn" onclick="selectToggle(this,'menstrual-grp','menstrual')">
+                <i class="fas fa-check-circle" style="font-size:11px;margin-right:4px;"></i>Regular
+              </button>
+              <button class="toggle-btn" onclick="selectToggle(this,'menstrual-grp','menstrual')">
+                <i class="fas fa-circle-exclamation" style="font-size:11px;margin-right:4px;"></i>Irregular
+              </button>
+              <button class="toggle-btn" onclick="selectToggle(this,'menstrual-grp','menstrual')">
+                <i class="fas fa-circle-xmark" style="font-size:11px;margin-right:4px;"></i>Absent
+              </button>
+            </div>
+            <span class="err-msg" id="menstrual-err"><i class="fas fa-triangle-exclamation"></i> Please select one</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label><i class="fas fa-person-dress"></i> Excess Hair Growth (Hirsutism)</label>
+            <div class="toggle-group" id="hirsutism-grp">
+              <button class="toggle-btn" onclick="selectToggle(this,'hirsutism-grp','hirsutism')">
+                <i class="fas fa-check" style="font-size:11px;margin-right:4px;"></i>Yes
+              </button>
+              <button class="toggle-btn" onclick="selectToggle(this,'hirsutism-grp','hirsutism')">
+                <i class="fas fa-xmark" style="font-size:11px;margin-right:4px;"></i>No
+              </button>
+            </div>
+            <span class="err-msg" id="hirsutism-err"><i class="fas fa-triangle-exclamation"></i> Please select one</span>
+          </div>
+          <div class="field">
+            <label><i class="fas fa-dna"></i> Family History of PCOS</label>
+            <div class="toggle-group" id="family-grp">
+              <button class="toggle-btn" onclick="selectToggle(this,'family-grp','family')">
+                <i class="fas fa-check" style="font-size:11px;margin-right:4px;"></i>Yes
+              </button>
+              <button class="toggle-btn" onclick="selectToggle(this,'family-grp','family')">
+                <i class="fas fa-xmark" style="font-size:11px;margin-right:4px;"></i>No
+              </button>
+              <button class="toggle-btn" onclick="selectToggle(this,'family-grp','family')">
+                <i class="fas fa-question" style="font-size:11px;margin-right:4px;"></i>Unknown
+              </button>
+            </div>
+            <span class="err-msg" id="family-err"><i class="fas fa-triangle-exclamation"></i> Please select one</span>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Lifestyle -->
+        <div class="section-divider">
+          <div class="divider-line"></div>
+          <div class="divider-label"><i class="fas fa-leaf" style="font-size:10px;"></i> Lifestyle</div>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="slider-field">
+            <label><i class="fas fa-brain" style="color:var(--pink);font-size:11px;"></i> Stress Level</label>
+            <div class="slider-label-row">
+              <span>Low stress</span>
+              <div class="slider-val-pill" id="stress-val">5</div>
+              <span>High stress</span>
+            </div>
+            <input type="range" min="1" max="10" value="5" step="1"
+                   oninput="document.getElementById('stress-val').textContent=this.value; formData.stress=this.value;" />
+            <span class="hint">1 = very low &nbsp;·&nbsp; 10 = very high</span>
+          </div>
+
+          <div class="slider-field">
+            <label><i class="fas fa-dumbbell" style="color:var(--pink);font-size:11px;"></i> Lifestyle Score</label>
+            <div class="slider-label-row">
+              <span>Poor</span>
+              <div class="slider-val-pill" id="lifestyle-val">5</div>
+              <span>Excellent</span>
+            </div>
+            <input type="range" min="1" max="10" value="5" step="1"
+                   oninput="document.getElementById('lifestyle-val').textContent=this.value; formData.lifestyle=this.value;" />
+            <span class="hint">Diet, exercise & sleep combined</span>
+          </div>
+        </div>
+
+      </div><!-- /card-body -->
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <span class="footer-note">
+          <i class="fas fa-shield-halved" style="font-size:13px; color: var(--rose);"></i>
+          Your data is encrypted and never shared without consent
+        </span>
+        <div class="footer-actions">
+          <a href="second.html" class="btn-secondary">
+            <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back
+          </a>
+          <button class="btn-primary" id="nextBtn" onclick="submitForm()">
+            Continue to AI Analysis <i class="fas fa-arrow-right" style="font-size:12px;"></i>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /main-card -->
+
+    <!-- Side Stats -->
+    <div class="side-info">
+      <div class="side-card">
+        <div class="side-card-icon"><i class="fas fa-globe"></i></div>
+        <div class="side-card-val">75</div>
+        <div class="side-card-lbl">Countries in Dataset</div>
+      </div>
+      <div class="side-card">
+        <div class="side-card-icon"><i class="fas fa-brain"></i></div>
+        <div class="side-card-val">99%</div>
+        <div class="side-card-lbl">Model Accuracy</div>
+      </div>
+      <div class="side-card">
+        <div class="side-card-icon"><i class="fas fa-bolt"></i></div>
+        <div class="side-card-val">2s</div>
+        <div class="side-card-lbl">Analysis Time</div>
+      </div>
+    </div>
+
+  </div><!-- /page-inner -->
+</div>
+
+<!-- ── FOOTER ── -->
+<footer style="background: var(--rose-dk); color: rgba(255,255,255,0.6); text-align: center; padding: 1.5rem; font-size: 13px;">
+  <p>© 2026 <span style="color:#ed93b1;">SheSure</span> — Not a substitute for professional medical advice.</p>
+</footer>
+
+<script>
+  // ── Form state ──
+  const formData = {
+    age: '', bmi: '', ethnicity: '', area: '',
+    menstrual: '', hirsutism: '', family: '',
+    stress: 5, lifestyle: 5
+  };
+
+  // ── Toggle selection ──
+  function selectToggle(btn, groupId, field) {
+    const group = document.getElementById(groupId);
+    group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    formData[field] = btn.textContent.trim();
+    // hide error
+    const err = document.getElementById(field + '-err');
+    if (err) err.classList.remove('show');
+  }
+
+  // ── Field validation ──
+  function validateField(id) {
+    const el  = document.getElementById(id);
+    const err = document.getElementById(id + '-err');
+    let valid = true;
+
+    if (id === 'age') {
+      const v = parseInt(el.value);
+      valid = !isNaN(v) && v >= 15 && v <= 50;
+      formData.age = el.value;
+    } else if (id === 'bmi') {
+      const v = parseFloat(el.value);
+      valid = !isNaN(v) && v >= 14 && v <= 55;
+      formData.bmi = el.value;
+    } else if (id === 'ethnicity' || id === 'area') {
+      valid = el.value !== '';
+      formData[id === 'area' ? 'area' : 'ethnicity'] = el.value;
+    }
+
+    el.classList.toggle('error', !valid);
+    if (err) err.classList.toggle('show', !valid);
+    return valid;
+  }
+
+  // ── Submit ──
+  function submitForm() {
+    let allValid = true;
+
+    // validate inputs
+    ['age','bmi','ethnicity','area'].forEach(id => {
+      if (!validateField(id)) allValid = false;
+    });
+
+    // validate toggles
+    ['menstrual','hirsutism','family'].forEach(field => {
+      if (!formData[field]) {
+        document.getElementById(field + '-err').classList.add('show');
+        allValid = false;
+      }
+    });
+
+    if (!allValid) {
+      // scroll to first error
+      const firstErr = document.querySelector('.err-msg.show');
+      if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Store and navigate
+    sessionStorage.setItem('clinicalData', JSON.stringify(formData));
+    window.location.href = 'forth.html';
+  }
+</script>
+
+</body>
+</html>
