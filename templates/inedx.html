@@ -407,7 +407,7 @@
       <li><a href="#symptoms">Check Symptoms</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#how">How It Works</a></li>
-      <li><a href="second.html" class="nav-cta">Start Detection</a></li>
+      <li><a href="{{ url_for('serve_template', filename='second') }}" class="nav-cta">Start Detection</a></li>
     </ul>
   </nav>
 </header>
@@ -425,7 +425,7 @@
       <h1>Early PCOS Detection, <em>Made Simple</em></h1>
       <p>Upload your ultrasound image and clinical data for instant, accurate PCOS diagnosis with probability scores. Early detection made simple and elegant.</p>
       <div class="hero-actions">
-        <a href="second.html" class="btn-primary">Start Detection Now</a>
+        <a href="{{ url_for('serve_template', filename='second') }}" class="btn-primary">Start Detection Now</a>
         <a href="#symptoms" class="btn-ghost">Check symptoms <i class="fas fa-arrow-right" style="font-size:12px;"></i></a>
       </div>
     </div>
@@ -483,7 +483,7 @@
       <div class="risk-badge" id="riskBadge">Select symptoms</div>
     </div>
     <div class="checker-cta">
-      <a href="second.html" class="btn-primary" id="checkerBtn">Start Full Detection →</a>
+      <a href="{{ url_for('serve_template', filename='second') }}" class="btn-primary" id="checkerBtn">Start Full Detection →</a>
       <span class="checker-note">⚠️ Not a substitute for medical advice. Always consult a doctor.</span>
     </div>
   </div>
@@ -582,7 +582,7 @@
     <span class="section-eyebrow">Get started</span>
     <h2>Ready for your PCOS assessment?</h2>
     <p>Upload your first scan today and take control of your reproductive health. Fast, private, and clinically validated.</p>
-    <a href="second.html" class="btn-primary">Start Free Detection →</a>
+    <a href="{{ url_for('serve_template', filename='second') }}" class="btn-primary">Start Free Detection →</a>
   </div>
 </section>
 

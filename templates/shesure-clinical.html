@@ -322,7 +322,7 @@
 <!-- ── HEADER ── -->
 <header>
   <nav>
-    <a href="inedx.html" class="logo">
+    <a href="{{ url_for('index') }}" class="logo">
       <svg width="175" height="40" viewBox="0 0 175 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="10" width="32" height="20" rx="10" fill="#fce8f0" stroke="#c2185b" stroke-width="1.5"/>
         <path d="M8 20 L12 20 L15 13 L18 27 L21 20 L28 20" stroke="#c2185b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -340,7 +340,7 @@
         <div class="step-line"></div>
         <div class="step-dot">3</div>
       </div>
-      <a href="second.html" class="nav-back">
+      <a href="{{ url_for('serve_template', filename='second') }}" class="nav-back">
         <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back to Upload
       </a>
     </div>
@@ -478,7 +478,7 @@
           Your data is encrypted and never shared without consent
         </span>
         <div class="footer-actions">
-          <a href="second.html" class="btn-secondary">
+          <a href="{{ url_for('serve_template', filename='second') }}" class="btn-secondary">
             <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back
           </a>
           <button class="btn-primary" id="analyzeBtn" onclick="submitClinicalData()">

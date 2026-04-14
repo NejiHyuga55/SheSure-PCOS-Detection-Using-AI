@@ -407,7 +407,7 @@
 <!-- ── HEADER ── -->
 <header>
   <nav>
-    <a href="inedx.html" class="logo">
+    <a href="{{ url_for('index') }}" class="logo">
       <svg width="175" height="40" viewBox="0 0 175 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="10" width="32" height="20" rx="10" fill="#fce8f0" stroke="#c2185b" stroke-width="1.5"/>
         <path d="M8 20 L12 20 L15 13 L18 27 L21 20 L28 20" stroke="#c2185b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -423,7 +423,7 @@
         <div class="step-line done"></div>
         <div class="step-dot active">3</div>
       </div>
-      <a href="inedx.html" class="nav-back">
+      <a href="{{ url_for('index') }}" class="nav-back">
         <i class="fas fa-arrow-left" style="font-size:11px;"></i> Back to Home
       </a>
     </div>
@@ -548,7 +548,7 @@
               </div>
               <div class="conf-bar-row">
                 <div class="conf-bar-label">
-                  <span class="conf-bar-name"><i class="fas fa-clipboard-list" style="margin-right:6px;color:var(--pink);"></i>MLP Clinical analysis</span>
+                  <span class="conf-bar-name"><i class="fas fa-clipboard-list" style="margin-right:6px;color:var(--pink);"></i>Clinical data analysis</span>
                   <span class="conf-bar-val" id="clinConfVal">91%</span>
                 </div>
                 <div class="conf-bar-track"><div class="conf-bar-fill" id="clinConfBar"></div></div>
@@ -665,7 +665,7 @@
           Your data is encrypted and never stored
         </span>
         <div class="footer-actions">
-          <a href="third.html" class="btn-secondary">
+          <a href="{{ url_for('serve_template', filename='third') }}" class="btn-secondary">
             <i class="fas fa-arrow-left" style="font-size:11px;"></i> Retake
           </a>
           <button class="btn-primary" onclick="window.print()">
@@ -703,14 +703,16 @@
 </footer>
 
 <script>
-  // ── Read result from Flask template variables ──
-  const PCOS_PROB    = {{ prediction|default(0.82) }};
-  const CNN_CONF     = Math.round({{ cnn_prob|default(0.87) }} * 100);
-  const CLIN_CONF    = Math.round({{ mlp_prob|default(0.91) }} * 100);
-  const FUS_CONF     = Math.round({{ prediction|default(0.89) }} * 100);
+  // ── Read result from session or use demo values ──
+  const data = JSON.parse(sessionStorage.getItem('clinicalData') || '{}');
 
+  // Demo values — replace with real model output
+  const PCOS_PROB    = 0.82;   // ← from your fusion model
   const HEALTHY_PROB = 1 - PCOS_PROB;
   const IS_PCOS      = PCOS_PROB >= 0.5;
+  const CNN_CONF     = 87;
+  const CLIN_CONF    = 91;
+  const FUS_CONF     = 89;
 
   // ── Update result hero ──
   function setupResult() {
