@@ -308,27 +308,53 @@ def train_mlp_model():
     df = pd.read_csv("data/pcos_prediction_dataset.csv")
     print(f"Dataset shape: {df.shape}")
 
-    # Preprocess data
-    # Drop non-numeric columns for simplicity
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    df_numeric = df[numeric_cols]
-
-    # Handle target column
-    target_col = 'Diagnosis' if 'Diagnosis' in df.columns else df.columns[-1]
-    if target_col not in df_numeric.columns:
-        # Convert target to numeric if needed
-        df[target_col] = LabelEncoder().fit_transform(df[target_col])
-        df_numeric[target_col] = df[target_col]
-
-    # Features and target
-    feature_cols = [col for col in df_numeric.columns if col != target_col]
-    X = df_numeric[feature_cols].values
-    y = df_numeric[target_col].values
+    # Preprocess data - encode all categorical columns to numeric
+    from sklearn.preprocessing import LabelEncoder
+    df_processed = df.copy()
+    
+    # Get target column
+    target_col = 'Diagnosis'
+    
+    # Encode all non-numeric columns except target
+    label_encoders = {}
+    for col in df_processed.columns:
+        if col != target_col and df_processed[col].dtype == 'object':
+            le = LabelEncoder()
+            df_processed[col] = le.fit_transform(df_processed[col].astype(str))
+            label_encoders[col] = le
+    
+    # Encode target
+    le_target = LabelEncoder()
+    df_processed[target_col] = le_target.fit_transform(df_processed[target_col].astype(str))
+    
+    # Features and target - use all columns except target
+    feature_cols = [col for col in df_processed.columns if col != target_col]
+    X = df_processed[feature_cols].values
+    y = df_processed[target_col].values
+    print(f"X shape after encoding: {X.shape}")
 
     # Handle missing values
     from sklearn.impute import SimpleImputer
     imputer = SimpleImputer(strategy='median')
     X = imputer.fit_transform(X)
+
+    # Select top 12 most relevant features for PCOS detection
+    # Based on medical importance and form inputs
+    feature_cols_12 = [
+        'Age', 'BMI', 'Menstrual Regularity', 'Hirsutism', 'Acne Severity',
+        'Family History of PCOS', 'Insulin Resistance', 'Lifestyle Score',
+        'Stress Levels', 'Socioeconomic Status', 'Awareness of PCOS', 'Undiagnosed PCOS Likelihood'
+    ]
+    
+    # Get indices of these feature columns
+    feature_cols_all = [col for col in df_processed.columns if col != target_col]
+    indices_12 = [feature_cols_all.index(col) for col in feature_cols_12 if col in feature_cols_all]
+    
+    if len(indices_12) > 0:
+        X = X[:, indices_12]
+        print(f"Selected {X.shape[1]} most important PCOS features")
+    else:
+        print("Using all features (12 feature selection failed)")
 
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=SEED, stratify=y)
