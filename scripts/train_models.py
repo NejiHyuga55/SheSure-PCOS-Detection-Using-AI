@@ -20,6 +20,9 @@ import pickle
 import warnings
 warnings.filterwarnings('ignore')
 
+# Get the project root directory (parent of scripts folder)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Set random seeds for reproducibility
 SEED = 42
 np.random.seed(SEED)
@@ -135,8 +138,8 @@ def train_cnn_model():
     print("=" * 50)
 
     # Data paths
-    train_dir = "ultrasound_data/train"
-    test_dir = "ultrasound_data/test"
+    train_dir = os.path.join(PROJECT_ROOT, "ultrasound_data", "train")
+    test_dir = os.path.join(PROJECT_ROOT, "ultrasound_data", "test")
 
     # Collect image paths and labels
     train_images = []
@@ -287,7 +290,8 @@ def train_cnn_model():
         # Save best model
         if val_acc > best_acc:
             best_acc = val_acc
-            torch.save(model.state_dict(), "models/pcos_cnn_final.pt")
+            model_path = os.path.join(PROJECT_ROOT, "models", "pcos_cnn_final.pt")
+            torch.save(model.state_dict(), model_path)
             patience_counter = 0
             print("  📁 Model saved!")
         else:
@@ -305,7 +309,8 @@ def train_mlp_model():
     print("=" * 50)
 
     # Load clinical dataset
-    df = pd.read_csv("data/pcos_prediction_dataset.csv")
+    data_path = os.path.join(PROJECT_ROOT, "data", "pcos_prediction_dataset.csv")
+    df = pd.read_csv(data_path)
     print(f"Dataset shape: {df.shape}")
 
     # Preprocess data - encode all categorical columns to numeric
@@ -366,7 +371,8 @@ def train_mlp_model():
 
     # Save scaler for app.py
     import joblib
-    joblib.dump(scaler, "models/scaler.pkl")
+    scaler_path = os.path.join(PROJECT_ROOT, "models", "scaler.pkl")
+    joblib.dump(scaler, scaler_path)
 
     print(f"Training features shape: {X_train_scaled.shape}")
     print(f"Test features shape: {X_test_scaled.shape}")
@@ -448,7 +454,8 @@ def train_mlp_model():
         # Save best model
         if val_acc > best_acc:
             best_acc = val_acc
-            torch.save(model.state_dict(), "models/mlp_model.pt")
+            model_path = os.path.join(PROJECT_ROOT, "models", "mlp_model.pt")
+            torch.save(model.state_dict(), model_path)
             patience_counter = 0
             print("  📁 Model saved!")
         else:
@@ -487,5 +494,6 @@ if __name__ == "__main__":
         print(f"❌ MLP training failed: {e}")
 
     print("\n🎉 Training completed!")
-    print("📁 Models saved to 'models/' directory")
+    models_dir = os.path.join(PROJECT_ROOT, "models")
+    print(f"📁 Models saved to '{models_dir}' directory")
     print("🔄 Restart the Flask app to use the new trained models")
